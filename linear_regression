@@ -88,7 +88,7 @@ X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
 for l2_reg in [0, 1e-2]:
     for l1_reg in [0, 1]:
-        lm = LinearRegression(l1_penalty=l1_reg)
+        lm = LinearRegression(l1_penalty=l1_reg, l2_penalty=l2_reg)
         lm.fit(X_train, y_train, method='coordinate_descent')
         y_pred = lm.predict(X_test)
         print(f"MSE for l1 reg: {l1_reg}, l2_reg: {l2_reg}")
