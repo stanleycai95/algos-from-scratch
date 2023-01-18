@@ -23,9 +23,9 @@ class LinearRegression:
             for i in range(iterations):
                 lr *= 0.99
                 preds = np.dot(X, self.Beta)[:,None]
-                gradient = np.mean(np.dot(X.T, preds - y[:, None]) + \
+                gradient = np.mean(np.dot(X.T, preds - y[:, None]) / X.shape[0] + \
                                    self.l1_penalty * np.sign(self.Beta) + \
-                                   self.l2_penalty * self.Beta, axis=1) / X.shape[0]
+                                   self.l2_penalty * self.Beta, axis=1)
                 self.Beta -= lr * gradient
                 self.Beta[self.Beta < tol] = 0
             
@@ -57,7 +57,6 @@ class LinearRegression:
     def mean_squared_error(self, preds, y):
         return np.dot((y[:,None] - preds).T, (y[:,None] - preds)) / y.shape[0]
     
-
 """
 ElasticNet derivation
 Cost = (y – X Beta)T (y – X Beta) + lambda1 ||Beta||1 + lambda2 BetaT Beta
@@ -66,17 +65,18 @@ Cost = (y – X Beta)T (y – X Beta) + lambda1 ||Beta||1 + lambda2 BetaT Beta
 dCost / dBeta
 = -2XT y + 2 XT X Beta + lambda1 sign(Beta) + 2 lambda2 Beta = 0
 
-Ridge regression solution:
 (XT X + lambda2 I) Beta = XT y
 Beta = (XT X + lambda2 I)-1 XT y
 """
 
+
 import seaborn as sns
+
 tips = sns.load_dataset("tips")
 sns.regplot(x="total_bill", y="tip", data=tips)
 tips = tips.sample(frac=1)
-
 X, y = tips[['total_bill', 'size']].values, tips['tip'].values
+
 X = np.hstack((X, np.random.normal(0, 30, X.shape[0])[:,None]))
 std_X = np.std(X, axis=0)
 std_X[std_X < 1] = 1
@@ -86,7 +86,7 @@ train_test_cutoff = tips.shape[0]//5 * 4
 X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
 X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-for l2_reg in [0, 1e-2]:
+for l2_reg in [0, 1]:
     for l1_reg in [0, 1]:
         lm = LinearRegression(l1_penalty=l1_reg, l2_penalty=l2_reg)
         lm.fit(X_train, y_train, method='coordinate_descent')
@@ -95,6 +95,7 @@ for l2_reg in [0, 1e-2]:
         print(lm.mean_squared_error(y_pred, y_test))
         print("Betas")
         print(lm.Beta.flatten())
+
 
 from sklearn.linear_model import ElasticNet
 regr = ElasticNet(random_state=0, alpha=1e-1)
