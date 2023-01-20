@@ -33,14 +33,15 @@ class LinearRegression:
             
         elif method == 'coordinate_descent':
             self.Beta = np.random.normal(0, 1, X.shape[1])
+            self.alpha = self.l1_penalty * X.shape[0]
             for i in range(iterations // 10):
                 for j in range(X.shape[1]):
                     p = np.dot(X.T[j,:], y - np.dot(np.delete(X, j, 1), np.delete(self.Beta, j, 0)))
                     z = np.dot(X.T[j,:], X[:,j])
-                    if p > self.l1_penalty: 
-                        self.Beta[j] = (p - self.l1_penalty) / z
-                    elif p < self.l1_penalty:
-                        self.Beta[j] = (p + self.l1_penalty) / z
+                    if p > self.alpha: 
+                        self.Beta[j] = (p - self.alpha) / z
+                    elif p < -self.alpha:
+                        self.Beta[j] = (p + self.alpha) / z
                     else:
                         self.Beta[j] = 0
             self.Beta = self.Beta[:,None]
@@ -86,8 +87,8 @@ train_test_cutoff = tips.shape[0]//5 * 4
 X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
 X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-for l2_reg in [0, 1]:
-    for l1_reg in [0, 1]:
+for l2_reg in [0]:
+    for l1_reg in [0.1]:
         lm = LinearRegression(l1_penalty=l1_reg, l2_penalty=l2_reg)
         lm.fit(X_train, y_train, method='coordinate_descent')
         y_pred = lm.predict(X_test)
