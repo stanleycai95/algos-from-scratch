@@ -2,8 +2,12 @@ import numpy as np
 
 class LogisticRegression:
     
-    def __init__(self):
-        self.Beta = None
+    def __init__(self, C=1, l1_ratio=0):
+        assert C > 0, "invalid C"
+        assert 0 <= l1_ratio <= 1, "invalid l1_ratio"
+        
+        self.l1_reg = l1_ratio / C
+        self.l2_reg = (1 - l1_ratio) / C
         
     def reformat_y(self, y):
         if len(y.shape) == 1:
@@ -27,6 +31,7 @@ class LogisticRegression:
             for i in range(iterations):
                 y_pred = self.predict(X)
                 gradient = np.mean(X.T @ (y_pred - y), axis=1)[:,None]
+                gradient_with_regularization = gradient + self.l1_reg * np.abs(self.Beta) + 1/2 * self.l2_reg * np.square(self.Beta)
                 self.Beta -= lr * gradient
     
     def sigmoid(self, X) :
