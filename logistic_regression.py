@@ -2,12 +2,13 @@ import numpy as np
 
 class LogisticRegression:
     
-    def __init__(self, C=1, l1_ratio=0):
+    def __init__(self, C=1e-3, l1_ratio=0, tol=1e-3):
         assert C > 0, "invalid C"
         assert 0 <= l1_ratio <= 1, "invalid l1_ratio"
         
         self.l1_reg = l1_ratio / C
         self.l2_reg = (1 - l1_ratio) / C
+        self.tol = tol
         
     def reformat_y(self, y):
         if len(y.shape) == 1:
@@ -29,10 +30,12 @@ class LogisticRegression:
         
         if method == 'SGD':
             for i in range(iterations):
+                lr *= 0.99
                 y_pred = self.predict(X)
                 gradient = np.mean(X.T @ (y_pred - y), axis=1)[:,None]
-                gradient_with_regularization = gradient + self.l1_reg * np.abs(self.Beta) + 1/2 * self.l2_reg * np.square(self.Beta)
-                self.Beta -= lr * gradient
+                gradient_with_regularization = gradient + self.l1_reg * np.sign(self.Beta) + self.l2_reg * self.Beta
+                self.Beta -= lr * gradient_with_regularization
+                self.Beta[np.abs(self.Beta) < self.tol] = 0
     
     def sigmoid(self, X) :
         return 1 / (1 + np.exp(-X))
@@ -68,7 +71,7 @@ train_test_cutoff = X.shape[0] * 4 // 5
 X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
 X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-logreg = LogisticRegression()
+logreg = LogisticRegression(C, l1_ratio)
 logreg.fit(X_train, y_train)
 y_pred = logreg.predict(X_test)
 print(logreg.score(y_pred, y_test))
