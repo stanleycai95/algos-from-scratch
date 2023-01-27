@@ -17,9 +17,9 @@ class PrincipalComponentsAnalysis:
         self.eigenvalues, self.eigenvectors = np.linalg.eigh(self.X_cov)
     
     def get_principal_components(self, k=2):
-        assert np.all(np.abs(self.eigenvalues[:-1]) >= np.abs(self.eigenvalues[1:])), "eigenvalues not sorted descending"
+        assert np.all(np.abs(self.eigenvalues[:-1]) <= np.abs(self.eigenvalues[1:])), "eigenvalues not sorted ascending"
         
-        self.W = self.eigenvectors[:,:k]
+        self.W = self.eigenvectors[:,-k:]
     
     def get_dimensionality_reduction(self):
         self.X_dimension_reduction = self.X @ self.W
