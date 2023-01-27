@@ -17,7 +17,7 @@ class PrincipalComponentsAnalysis:
         self.eigenvalues, self.eigenvectors = np.linalg.eig(self.X_cov)
     
     def get_principal_components(self, k=2):
-        assert np.all(self.eigenvalues[:-1] >= self.eigenvalues[1:]), "eigenvalues not sorted descending"
+        assert np.all(np.abs(self.eigenvalues[:-1]) >= np.abs(self.eigenvalues[1:])), "eigenvalues not sorted descending"
         
         self.W = self.eigenvectors[:,:k]
     
