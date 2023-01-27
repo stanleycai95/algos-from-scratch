@@ -11,7 +11,7 @@ class PrincipalComponentsAnalysis:
     def get_covariance_matrix(self):
         self.X_means = np.mean(self.X, axis=0)
         X_centered = (self.X - self.X_means)
-        self.X_cov = (X_centered.T @ X_centered) / X_centered.shape[0]
+        self.X_cov = (X_centered.T @ X_centered)
         
     def get_eigenvalues(self):
         self.eigenvalues, self.eigenvectors = np.linalg.eig(self.X_cov)
