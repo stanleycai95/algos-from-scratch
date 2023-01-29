@@ -57,18 +57,6 @@ class LinearRegression:
     
     def mean_squared_error(self, preds, y):
         return np.dot((y[:,None] - preds).T, (y[:,None] - preds)) / y.shape[0]
-    
-"""
-ElasticNet derivation
-Cost = (y – X Beta)T (y – X Beta) + lambda1 ||Beta||1 + lambda2 BetaT Beta
-= yTy – 2yT X Beta + BetaT XT X Beta + lambda1 ||Beta||1 + lambda2 Beta T Beta
-
-dCost / dBeta
-= -2XT y + 2 XT X Beta + lambda1 sign(Beta) + 2 lambda2 Beta = 0
-
-(XT X + lambda2 I) Beta = XT y
-Beta = (XT X + lambda2 I)-1 XT y
-"""
 
 
 import seaborn as sns
