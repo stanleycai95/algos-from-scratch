@@ -87,44 +87,6 @@ class DecisionTree:
             ans[right_mask] = self.right.predict(X[right_mask])
             
             return ans
-
-class RandomForest:
-    
-    def __init__(self, X, y, method='C4.5', depth=5, num_trees=10):
-        self.method = method
-        self.depth = depth
-        self.X = X
-        self.y = y
-        self.num_trees = num_trees
-        self.decision_trees = []
-        
-    def fit(self):
-        num_features_per_tree = np.around(np.sqrt(X.shape[1])).astype(int)
-        potential_features = np.array(list(range(self.X.shape[1])))
-        num_samples_per_tree = X.shape[0] * 2 // 3
-        potential_samples = np.array(list(range(self.X.shape[0])))
-        
-        for i in range(self.num_trees):
-            feature_subset = np.random.choice(potential_features, num_features_per_tree, replace=False)
-            row_subset = np.random.choice(potential_samples, num_samples_per_tree, replace=False)
-            
-            dt = DecisionTree(X=X[row_subset,:], y=y[row_subset], attributes=feature_subset)
-            dt.fit()
-            self.decision_trees.append(dt)
-
-    def predict(self, X):
-        assert len(self.decision_trees) > 0, "Random Forest must be fit before prediction"
-        
-        ans = np.zeros(X.shape[0])
-        for dt in self.decision_trees:
-            ans += dt.predict(X)
-        
-        ans /= len(self.decision_trees)
-        
-        ans[ans<=0.5] = 0
-        ans[ans>0.5] = 1
-        
-        return ans
             
 def accuracy(y_pred, y):
     return np.mean(y_pred == y)
