@@ -143,15 +143,8 @@ dt = DecisionTree(X_train, y_train)
 dt.fit()
 y_pred = dt.predict(X_test)
 
-rf = RandomForest(X_train, y_train)
-rf.fit()
-y_pred_rf = rf.predict(X_test)
-
 print("Decision tree accuracy")
 print(accuracy(y_pred, y_test))
-
-print("Random Forest accuracy")
-print(accuracy(y_pred_rf, y_test))
 
 print("Class balance check")
 print(np.mean(y))
