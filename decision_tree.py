@@ -42,6 +42,12 @@ class DecisionTree:
         
         return -np.sum(p * np.log2(p))
     
+    def construct_splits(self, X):
+        left_mask = X[:, self.split_attr] <= self.split_threshold
+        right_mask = X[:, self.split_attr] > self.split_threshold
+        
+        return left_mask, right_mask
+    
     def fit(self):
         self.fitted = True
         
@@ -63,13 +69,14 @@ class DecisionTree:
                         self.split_threshold = self.X[i, attr]
                         self.split_attr = attr
                         self.split_info_gain = temp_info_gain
-                        
-                        self.left = DecisionTree(X=self.X[:i+1,:], y=self.y[:i+1], method=self.method, depth=self.depth-1)
-                        self.right = DecisionTree(X=self.X[i+1:,:], y=self.y[i+1:], method=self.method, depth=self.depth-1)
 
             if self.split_info_gain == 0:
                 self.label = (np.mean(self.y) > 0.5).astype(int)
             else:
+                left_mask, right_mask = self.construct_splits(self.X)
+                self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1)
+                self.right = DecisionTree(X=self.X[right_mask], y=self.y[right_mask], method=self.method, depth=self.depth-1)
+                
                 self.left.fit()
                 self.right.fit()
     
@@ -80,8 +87,7 @@ class DecisionTree:
             return np.array([self.label] * X.shape[0])
         else:
             ans = np.empty(X.shape[0])
-            left_mask = X[:, self.split_attr] <= self.split_threshold
-            right_mask = X[:, self.split_attr] > self.split_threshold
+            left_mask, right_mask = self.construct_splits(X)
             
             ans[left_mask] = self.left.predict(X[left_mask])
             ans[right_mask] = self.right.predict(X[right_mask])
