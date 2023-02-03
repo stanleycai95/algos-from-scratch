@@ -13,7 +13,6 @@ class RandomForest:
         
     def fit(self):
         num_features_per_split = np.around(np.sqrt(X.shape[1])).astype(int)
-        potential_features = np.array(list(range(self.X.shape[1])))
         num_samples_per_tree = X.shape[0] * 2 // 3
         potential_samples = np.array(list(range(self.X.shape[0])))
         
