@@ -2,7 +2,7 @@ import numpy as np
 
 class DecisionTree:
     
-    def __init__(self, X, y, method='C4.5', depth=5, attributes=None):
+    def __init__(self, X, y, method='C4.5', depth=5, num_attributes=None):
         self.method = method
         self.depth = depth
         self.split_threshold = None
@@ -11,9 +11,11 @@ class DecisionTree:
         
         self.X = X
         self.y = y
-        self.attributes = attributes
-        if self.attributes is None:
-            self.attributes = list(range(self.X.shape[1]))
+        self.num_attributes = num_attributes
+        if self.num_attributes is None:
+            self.num_attributes = self.X.shape[1]
+        potential_features = np.array(list(range(self.X.shape[1])))
+        self.attributes = np.random.choice(potential_features, self.num_attributes, replace=False)
             
         self.left = None
         self.right = None
@@ -74,8 +76,8 @@ class DecisionTree:
                 self.label = (np.mean(self.y) > 0.5).astype(int)
             else:
                 left_mask, right_mask = self.construct_splits(self.X)
-                self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1)
-                self.right = DecisionTree(X=self.X[right_mask], y=self.y[right_mask], method=self.method, depth=self.depth-1)
+                self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes)
+                self.right = DecisionTree(X=self.X[right_mask], y=self.y[right_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes)
                 
                 self.left.fit()
                 self.right.fit()
