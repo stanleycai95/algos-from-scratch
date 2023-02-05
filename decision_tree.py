@@ -15,7 +15,7 @@ class DecisionTree:
         if self.num_attributes is None:
             self.num_attributes = self.X.shape[1]
         potential_features = np.array(list(range(self.X.shape[1])))
-        self.attributes = np.random.choice(potential_features, self.num_attributes, replace=False)
+        self.features = np.random.choice(potential_features, self.num_attributes, replace=False)
             
         self.left = None
         self.right = None
