@@ -10,7 +10,8 @@ class RandomForest:
         self.decision_trees = []
         
     def fit(self, X, y):
-        self.X, self.y = X, y
+        self.X = X
+        self.y = y
         num_features_per_split = np.around(np.sqrt(self.X.shape[1])).astype(int)
         potential_samples = np.array(list(range(self.X.shape[0])))
         
