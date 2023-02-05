@@ -13,11 +13,10 @@ class RandomForest:
         
     def fit(self):
         num_features_per_split = np.around(np.sqrt(X.shape[1])).astype(int)
-        num_samples_per_tree = X.shape[0] * 2 // 3
         potential_samples = np.array(list(range(self.X.shape[0])))
         
         for i in range(self.num_trees):
-            row_subset = np.random.choice(potential_samples, num_samples_per_tree, replace=False)
+            row_subset = np.random.choice(potential_samples, X.shape[0], replace=True)
             
             dt = DecisionTree(X=X[row_subset,:], y=y[row_subset], num_attributes=num_features_per_split)
             dt.fit()
