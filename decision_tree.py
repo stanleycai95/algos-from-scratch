@@ -2,7 +2,7 @@ import numpy as np
 
 class DecisionTree:
     
-    def __init__(self, X, y, method='C4.5', depth=5, num_attributes=None):
+    def __init__(self, X, y, method='C4.5', depth=5, num_attributes=None, regression=False):
         self.method = method
         self.depth = depth
         self.split_threshold = None
@@ -21,6 +21,7 @@ class DecisionTree:
         self.right = None
         self.label = None
         self.fitted = False
+        self.regression = regression
         
     def check_valid_probability(self, p):
         assert np.isclose(np.sum(p), 1), "probabilities do not sum to 1"
@@ -44,6 +45,9 @@ class DecisionTree:
         
         return -np.sum(p * np.log2(p))
     
+    def coefficient_variation(self, y):
+        return np.std(y) / np.mean(y)
+    
     def construct_splits(self, X):
         left_mask = X[:, self.split_attr] <= self.split_threshold
         right_mask = X[:, self.split_attr] > self.split_threshold
@@ -53,8 +57,10 @@ class DecisionTree:
     def fit(self):
         self.fitted = True
         
-        if (self.depth == 0) or (np.mean(self.y) == 0) or (np.mean(self.y) == 1):
+        if not self.regression and ((self.depth == 0) or (np.mean(self.y) == 0) or (np.mean(self.y) == 1)):
             self.label = (np.mean(self.y) > 0.5).astype(int)
+        elif self.regression and ((self.depth == 0) or (self.coefficient_variation(self.y) < 0.1)):
+            self.label = np.mean(self.y)
         else:
                 
             for attr in self.attributes:
@@ -63,9 +69,15 @@ class DecisionTree:
                 self.y = self.y[sort_order]
                 
                 for i in range(self.X.shape[0]-1):
-                    entropy_after_split = self.entropy(self.y[:i+1]) + self.entropy(self.y[i+1:])
-                    entropy_before_split = self.entropy(self.y)
-                    temp_info_gain = entropy_after_split - entropy_before_split
+                    if not self.regression:
+                        entropy_after_split = self.entropy(self.y[:i+1]) + self.entropy(self.y[i+1:])
+                        entropy_before_split = self.entropy(self.y)
+                        temp_info_gain = entropy_after_split - entropy_before_split
+                    else:
+                        summed_cv_after_split = (i+1) * self.coefficient_variation(self.y[:i+1]) + (len(self.y) - i - 1) * self.coefficient_variation(self.y[i+1:])
+                        cv_after_split = summed_cv_after_split / len(self.y)
+                        cv_before_split = self.coefficient_variation(self.y)
+                        temp_info_gain = cv_after_split - cv_before_split
                     
                     if temp_info_gain < self.split_info_gain:
                         self.split_threshold = self.X[i, attr]
@@ -73,11 +85,14 @@ class DecisionTree:
                         self.split_info_gain = temp_info_gain
 
             if self.split_info_gain == 0:
-                self.label = (np.mean(self.y) > 0.5).astype(int)
+                if not self.regression:
+                    self.label = (np.mean(self.y) > 0.5).astype(int)
+                else:
+                    self.label = np.mean(self.y)
             else:
                 left_mask, right_mask = self.construct_splits(self.X)
-                self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes)
-                self.right = DecisionTree(X=self.X[right_mask], y=self.y[right_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes)
+                self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes, regression=self.regression)
+                self.right = DecisionTree(X=self.X[right_mask], y=self.y[right_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes, regression=self.regression)
                 
                 self.left.fit()
                 self.right.fit()
@@ -97,11 +112,12 @@ class DecisionTree:
             return ans
             
 def accuracy(y_pred, y):
-    return np.mean(y_pred == y)
+    return np.mean(np.abs(y_pred - y)) / np.mean(np.abs(y))
 
-from sklearn.datasets import load_breast_cancer
+from sklearn.datasets import load_breast_cancer, fetch_california_housing
 
 X, y = load_breast_cancer(return_X_y=True)
+#X, y = fetch_california_housing(return_X_y=True)
 shuffle = np.random.permutation(len(X))
 X, y = X[shuffle], y[shuffle]
 
@@ -109,7 +125,7 @@ train_test_cutoff = X.shape[0] * 4//5
 X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
 X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-dt = DecisionTree(X_train, y_train)
+dt = DecisionTree(X_train, y_train, regression=True)
 dt.fit()
 y_pred = dt.predict(X_test)
 
