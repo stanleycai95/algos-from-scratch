@@ -58,27 +58,28 @@ class LogisticRegression:
         return np.mean(y == y_pred)
     
     
-import seaborn as sns
+def test_class():
+    import seaborn as sns
 
-titanic = sns.load_dataset('titanic')
-titanic = titanic.sample(frac=1).dropna()
-titanic_numeric = titanic.select_dtypes(include=np.number)
-X, y = titanic_numeric.drop(columns='survived').values, titanic_numeric['survived'].values
-X = (X - np.mean(X, axis=0).T) / X.std(axis=0).T
+    titanic = sns.load_dataset('titanic')
+    titanic = titanic.sample(frac=1).dropna()
+    titanic_numeric = titanic.select_dtypes(include=np.number)
+    X, y = titanic_numeric.drop(columns='survived').values, titanic_numeric['survived'].values
+    X = (X - np.mean(X, axis=0).T) / X.std(axis=0).T
 
-train_test_cutoff = X.shape[0] * 4 // 5
+    train_test_cutoff = X.shape[0] * 4 // 5
 
-X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
-X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
+    X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
+    X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-logreg = LogisticRegression(C, l1_ratio)
-logreg.fit(X_train, y_train)
-y_pred = logreg.predict(X_test)
-print(logreg.score(y_pred, y_test))
-print(logreg.Beta.flatten())
+    logreg = LogisticRegression(C, l1_ratio)
+    logreg.fit(X_train, y_train)
+    y_pred = logreg.predict(X_test)
+    print(logreg.score(y_pred, y_test))
+    print(logreg.Beta.flatten())
 
-import sklearn as sk
-clf = sk.linear_model.LogisticRegression(random_state=0).fit(X_train, y_train)
-clf.predict(X_test)
-print(clf.score(X_test, y_test))
-print(clf.intercept_, clf.coef_)
+    import sklearn as sk
+    clf = sk.linear_model.LogisticRegression(random_state=0).fit(X_train, y_train)
+    clf.predict(X_test)
+    print(clf.score(X_test, y_test))
+    print(clf.intercept_, clf.coef_)
