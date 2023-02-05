@@ -6,7 +6,7 @@ class DecisionTree:
         self.method = method
         self.depth = depth
         self.split_threshold = None
-        self.split_attr = None
+        self.split_feat = None
         self.split_info_gain = 0
         self.left = None
         self.right = None
@@ -40,28 +40,28 @@ class DecisionTree:
         return np.std(y) / max(abs(np.mean(y)), 1)
     
     def construct_splits(self, X):
-        left_mask = X[:, self.split_attr] <= self.split_threshold
-        right_mask = X[:, self.split_attr] > self.split_threshold
+        left_mask = X[:, self.split_feat] <= self.split_threshold
+        right_mask = X[:, self.split_feat] > self.split_threshold
         
         return left_mask, right_mask
     
-    def fit(self, X, y, num_attributes=None):
+    def fit(self, X, y, num_features=None):
         self.fitted = True
         self.X, self.y = X, y
         
-        self.num_attributes = num_attributes
-        if self.num_attributes is None:
-            self.num_attributes = self.X.shape[1]
+        self.num_features = num_features
+        if self.num_features is None:
+            self.num_features = self.X.shape[1]
         potential_features = np.array(list(range(self.X.shape[1])))
-        self.features = np.random.choice(potential_features, self.num_attributes, replace=False)
+        self.features = np.random.choice(potential_features, self.num_features, replace=False)
         
         if not self.regression and ((self.depth == 0) or (np.mean(self.y) == 0) or (np.mean(self.y) == 1)):
             self.label = np.mean(self.y)
         elif self.regression and ((self.depth == 0) or (self.coefficient_variation(self.y) < 0.1)):
             self.label = np.mean(self.y)
         else:
-            for attr in self.features:
-                sort_order = self.X[:, attr].argsort()
+            for feat in self.features:
+                sort_order = self.X[:, feat].argsort()
                 self.X = self.X[sort_order]
                 self.y = self.y[sort_order]
                 
@@ -76,8 +76,8 @@ class DecisionTree:
                         temp_info_gain = cv_after_split - cv_before_split
                     
                     if temp_info_gain < self.split_info_gain:
-                        self.split_threshold = self.X[i, attr]
-                        self.split_attr = attr
+                        self.split_threshold = self.X[i, feat]
+                        self.split_feat = feat
                         self.split_info_gain = temp_info_gain
 
             if self.split_info_gain == 0:
@@ -87,8 +87,8 @@ class DecisionTree:
                 self.left = DecisionTree(method=self.method, depth=self.depth-1, regression=self.regression)
                 self.right = DecisionTree(method=self.method, depth=self.depth-1, regression=self.regression)
                 
-                self.left.fit(X=self.X[left_mask], y=self.y[left_mask], num_attributes=self.num_attributes)
-                self.right.fit(X=self.X[right_mask], y=self.y[right_mask], num_attributes=self.num_attributes)
+                self.left.fit(X=self.X[left_mask], y=self.y[left_mask], num_features=self.num_features)
+                self.right.fit(X=self.X[right_mask], y=self.y[right_mask], num_features=self.num_features)
     
     def predict_proba(self, X):
         assert self.fitted, "Decision tree needs to be fit before prediction"
