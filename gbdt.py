@@ -66,7 +66,7 @@ gbdt.fit(X_train, y_train)
 y_pred_gbdt = gbdt.predict(X_test)
 
 print("GBDT loss")
-print(accuracy(y_pred_gbdt, y_test))
+print(loss_func(y_pred_gbdt, y_test))
 
 print("Class balance check")
 print(np.mean(y))
