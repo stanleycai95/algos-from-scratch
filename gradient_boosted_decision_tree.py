@@ -1,7 +1,7 @@
 import numpy as np
 from decision_tree import DecisionTree
 
-class GBDT:
+class GradientBoostedDecisionTree:
     
     def __init__(self, num_iterations=10, scaling_param=0.5, depth=2, regression=True):
         self.num_iterations = num_iterations
@@ -45,26 +45,28 @@ def loss_func(y_pred, y, regression=True):
     else:
         return 1 - np.mean(y_pred == y)
 
-from sklearn.datasets import fetch_california_housing
+    
+def test_class():
+    from sklearn.datasets import fetch_california_housing
 
-X, y = fetch_california_housing(return_X_y=True)
-shuffle = np.random.permutation(len(X))
-X, y = X[shuffle], y[shuffle]
+    X, y = fetch_california_housing(return_X_y=True)
+    shuffle = np.random.permutation(len(X))
+    X, y = X[shuffle], y[shuffle]
 
-train_test_cutoff = X.shape[0] * 4//5
-X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
-X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
+    train_test_cutoff = X.shape[0] * 4//5
+    X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
+    X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-dt = DecisionTree(regression=True)
-dt.fit(X_train, y_train)
-y_pred = dt.predict(X_test)
+    dt = DecisionTree(regression=True)
+    dt.fit(X_train, y_train)
+    y_pred = dt.predict(X_test)
 
-print("Decision tree loss")
-print(loss_func(y_pred, y_test))
+    print("Decision tree loss")
+    print(loss_func(y_pred, y_test))
 
-gbdt = GBDT(regression=True)
-gbdt.fit(X_train, y_train)
-y_pred_gbdt = gbdt.predict(X_test)
+    gbdt = GradientBoostedDecisionTree(regression=True)
+    gbdt.fit(X_train, y_train)
+    y_pred_gbdt = gbdt.predict(X_test)
 
-print("GBDT loss")
-print(loss_func(y_pred_gbdt, y_test))
+    print("GBDT loss")
+    print(loss_func(y_pred_gbdt, y_test))
