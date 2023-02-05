@@ -59,37 +59,37 @@ class LinearRegression:
         return np.dot((y[:,None] - preds).T, (y[:,None] - preds)) / y.shape[0]
 
 
-import seaborn as sns
+def test_class():
+    import seaborn as sns
 
-tips = sns.load_dataset("tips")
-sns.regplot(x="total_bill", y="tip", data=tips)
-tips = tips.sample(frac=1)
-X, y = tips[['total_bill', 'size']].values, tips['tip'].values
+    tips = sns.load_dataset("tips")
+    sns.regplot(x="total_bill", y="tip", data=tips)
+    tips = tips.sample(frac=1)
+    X, y = tips[['total_bill', 'size']].values, tips['tip'].values
 
-X = np.hstack((X, np.random.normal(0, 30, X.shape[0])[:,None]))
-std_X = np.std(X, axis=0)
-std_X[std_X < 1] = 1
-X = (X - np.mean(X, axis=0)) / std_X
+    X = np.hstack((X, np.random.normal(0, 30, X.shape[0])[:,None]))
+    std_X = np.std(X, axis=0)
+    std_X[std_X < 1] = 1
+    X = (X - np.mean(X, axis=0)) / std_X
 
-train_test_cutoff = tips.shape[0]//5 * 4
-X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
-X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
+    train_test_cutoff = tips.shape[0]//5 * 4
+    X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
+    X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-for l2_reg in [0]:
-    for l1_reg in [0.1]:
-        lm = LinearRegression(l1_penalty=l1_reg, l2_penalty=l2_reg)
-        lm.fit(X_train, y_train, method='coordinate_descent')
-        y_pred = lm.predict(X_test)
-        print(f"MSE for l1 reg: {l1_reg}, l2_reg: {l2_reg}")
-        print(lm.mean_squared_error(y_pred, y_test))
-        print("Betas")
-        print(lm.Beta.flatten())
-
-
-from sklearn.linear_model import ElasticNet
-regr = ElasticNet(random_state=0, alpha=1e-1)
-regr.fit(X_train, y_train)
-print("sklearn MSE")
-print(lm.mean_squared_error(regr.predict(X_test)[:, None], y_test))
-print("sklearn Betas")
-print(np.hstack(([regr.intercept_], regr.coef_)))
+    for l2_reg in [0]:
+        for l1_reg in [0.1]:
+            lm = LinearRegression(l1_penalty=l1_reg, l2_penalty=l2_reg)
+            lm.fit(X_train, y_train, method='coordinate_descent')
+            y_pred = lm.predict(X_test)
+            print(f"MSE for l1 reg: {l1_reg}, l2_reg: {l2_reg}")
+            print(lm.mean_squared_error(y_pred, y_test))
+            print("Betas")
+            print(lm.Beta.flatten())
+            
+    from sklearn.linear_model import ElasticNet
+    regr = ElasticNet(random_state=0, alpha=1e-1)
+    regr.fit(X_train, y_train)
+    print("sklearn MSE")
+    print(lm.mean_squared_error(regr.predict(X_test)[:, None], y_test))
+    print("sklearn Betas")
+    print(np.hstack(([regr.intercept_], regr.coef_)))
