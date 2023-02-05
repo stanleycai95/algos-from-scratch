@@ -2,21 +2,12 @@ import numpy as np
 
 class DecisionTree:
     
-    def __init__(self, X, y, method='C4.5', depth=5, num_attributes=None, regression=False):
+    def __init__(self, method='C4.5', depth=5, regression=False):
         self.method = method
         self.depth = depth
         self.split_threshold = None
         self.split_attr = None
         self.split_info_gain = 0
-        
-        self.X = X
-        self.y = y
-        self.num_attributes = num_attributes
-        if self.num_attributes is None:
-            self.num_attributes = self.X.shape[1]
-        potential_features = np.array(list(range(self.X.shape[1])))
-        self.features = np.random.choice(potential_features, self.num_attributes, replace=False)
-            
         self.left = None
         self.right = None
         self.label = None
@@ -54,8 +45,14 @@ class DecisionTree:
         
         return left_mask, right_mask
     
-    def fit(self):
+    def fit(self, X, y, num_attributes=None):
         self.fitted = True
+        self.X, self.y = X, y
+        self.num_attributes = num_attributes
+        if self.num_attributes is None:
+            self.num_attributes = self.X.shape[1]
+        potential_features = np.array(list(range(self.X.shape[1])))
+        self.features = np.random.choice(potential_features, self.num_attributes, replace=False)
         
         if not self.regression and ((self.depth == 0) or (np.mean(self.y) == 0) or (np.mean(self.y) == 1)):
             self.label = np.mean(self.y)
@@ -87,11 +84,11 @@ class DecisionTree:
                 self.label = np.mean(self.y)
             else:
                 left_mask, right_mask = self.construct_splits(self.X)
-                self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes, regression=self.regression)
-                self.right = DecisionTree(X=self.X[right_mask], y=self.y[right_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes, regression=self.regression)
+                self.left = DecisionTree(method=self.method, depth=self.depth-1, regression=self.regression)
+                self.right = DecisionTree(method=self.method, depth=self.depth-1, regression=self.regression)
                 
-                self.left.fit()
-                self.right.fit()
+                self.left.fit(X=self.X[left_mask], y=self.y[left_mask], num_attributes=self.num_attributes)
+                self.right.fit(X=self.X[right_mask], y=self.y[right_mask], num_attributes=self.num_attributes)
     
     def predict_proba(self, X):
         assert self.fitted, "Decision tree needs to be fit before prediction"
@@ -108,8 +105,9 @@ class DecisionTree:
             return ans
     
     def predict(self, X):
-        y_hat = self.predict_proba(self, X)
+        y_hat = self.predict_proba(X)
         if self.regression:
             return y_hat
         else:
             return (y_hat > 0.5).astype(int)
+            
