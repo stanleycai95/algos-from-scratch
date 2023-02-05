@@ -39,7 +39,7 @@ class RandomForest:
 def accuracy(y_pred, y):
     return np.mean(y_pred == y)
 
-def quick_test():
+def test_class():
     X, y = load_breast_cancer(return_X_y=True)
     shuffle = np.random.permutation(len(X))
     X, y = X[shuffle], y[shuffle]
