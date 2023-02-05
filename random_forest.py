@@ -19,7 +19,7 @@ class RandomForest:
             row_subset = np.random.choice(potential_samples, self.X.shape[0], replace=True)
             
             dt = DecisionTree()
-            dt.fit(X=self.X[row_subset,:], y=self.y[row_subset], num_attributes=num_features_per_split)
+            dt.fit(X=self.X[row_subset,:], y=self.y[row_subset], num_features=num_features_per_split)
             self.decision_trees.append(dt)
 
     def predict(self, X):
