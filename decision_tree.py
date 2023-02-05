@@ -48,6 +48,7 @@ class DecisionTree:
     def fit(self, X, y, num_attributes=None):
         self.fitted = True
         self.X, self.y = X, y
+        
         self.num_attributes = num_attributes
         if self.num_attributes is None:
             self.num_attributes = self.X.shape[1]
@@ -70,8 +71,7 @@ class DecisionTree:
                         entropy_before_split = self.entropy(self.y)
                         temp_info_gain = entropy_after_split - entropy_before_split
                     else:
-                        summed_cv_after_split = (i+1) * self.coefficient_variation(self.y[:i+1]) + (len(self.y) - i - 1) * self.coefficient_variation(self.y[i+1:])
-                        cv_after_split = summed_cv_after_split / len(self.y)
+                        cv_after_split = 1 / len(self.y) * ((i+1) * self.coefficient_variation(self.y[:i+1]) + (len(self.y) - i - 1) * self.coefficient_variation(self.y[i+1:]))
                         cv_before_split = self.coefficient_variation(self.y)
                         temp_info_gain = cv_after_split - cv_before_split
                     
