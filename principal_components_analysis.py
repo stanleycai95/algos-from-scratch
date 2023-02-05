@@ -42,17 +42,17 @@ class PrincipalComponentsAnalysis:
         return np.mean(np.abs(self.X_reconstructed - self.X))
     
     
-    
-from sklearn.datasets import load_breast_cancer
-cancer = load_breast_cancer()
+def test_class():
+    from sklearn.datasets import load_breast_cancer
+    cancer = load_breast_cancer()
 
-X, y = cancer.data, cancer.target
+    X, y = cancer.data, cancer.target
 
-pca = PrincipalComponentsAnalysis(X, y)
-pca.get_PCA()
-print(pca.get_abs_reconstruction_error())
-print(pca.W)
+    pca = PrincipalComponentsAnalysis(X, y)
+    pca.get_PCA()
+    print(pca.get_abs_reconstruction_error())
+    print(pca.W)
 
-from sklearn.decomposition import PCA
-sk_pca = PCA(2).fit(X)
-print(sk_pca.components_.T)
+    from sklearn.decomposition import PCA
+    sk_pca = PCA(2).fit(X)
+    print(sk_pca.components_.T)
