@@ -1,5 +1,6 @@
 import numpy as np
 from decision_tree import DecisionTree
+from sklearn.datasets import load_breast_cancer
 
 class RandomForest:
     
@@ -38,7 +39,6 @@ class RandomForest:
 def accuracy(y_pred, y):
     return np.mean(y_pred == y)
 
-from sklearn.datasets import load_breast_cancer
 def test_class():
     X, y = load_breast_cancer(return_X_y=True)
     shuffle = np.random.permutation(len(X))
