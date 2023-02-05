@@ -62,7 +62,7 @@ class DecisionTree:
         elif self.regression and ((self.depth == 0) or (self.coefficient_variation(self.y) < 0.1)):
             self.label = np.mean(self.y)
         else:
-            for attr in self.attributes:
+            for attr in self.features:
                 sort_order = self.X[:, attr].argsort()
                 self.X = self.X[sort_order]
                 self.y = self.y[sort_order]
