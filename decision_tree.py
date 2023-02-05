@@ -37,7 +37,7 @@ class DecisionTree:
         return -np.sum(p * np.log2(p))
     
     def coefficient_variation(self, y):
-        return np.std(y) / max(np.mean(y), 1)
+        return np.std(y) / max(abs(np.mean(y)), 1)
     
     def construct_splits(self, X):
         left_mask = X[:, self.split_attr] <= self.split_threshold
