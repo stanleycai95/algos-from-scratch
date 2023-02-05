@@ -38,29 +38,30 @@ class RandomForest:
 def accuracy(y_pred, y):
     return np.mean(y_pred == y)
 
-from sklearn.datasets import load_breast_cancer
+def quick_test():
+    from sklearn.datasets import load_breast_cancer
 
-X, y = load_breast_cancer(return_X_y=True)
-shuffle = np.random.permutation(len(X))
-X, y = X[shuffle], y[shuffle]
+    X, y = load_breast_cancer(return_X_y=True)
+    shuffle = np.random.permutation(len(X))
+    X, y = X[shuffle], y[shuffle]
 
-train_test_cutoff = X.shape[0] * 4//5
-X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
-X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
+    train_test_cutoff = X.shape[0] * 4//5
+    X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
+    X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-dt = DecisionTree()
-dt.fit(X_train, y_train)
-y_pred = dt.predict(X_test)
+    dt = DecisionTree()
+    dt.fit(X_train, y_train)
+    y_pred = dt.predict(X_test)
 
-rf = RandomForest()
-rf.fit(X_train, y_train)
-y_pred_rf = rf.predict(X_test)
+    rf = RandomForest()
+    rf.fit(X_train, y_train)
+    y_pred_rf = rf.predict(X_test)
 
-print("Decision tree accuracy")
-print(accuracy(y_pred, y_test))
+    print("Decision tree accuracy")
+    print(accuracy(y_pred, y_test))
 
-print("Random Forest accuracy")
-print(accuracy(y_pred_rf, y_test))
+    print("Random Forest accuracy")
+    print(accuracy(y_pred_rf, y_test))
 
-print("Class balance check")
-print(np.mean(y))
+    print("Class balance check")
+    print(np.mean(y))
