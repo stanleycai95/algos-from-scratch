@@ -58,7 +58,7 @@ class DecisionTree:
         self.fitted = True
         
         if not self.regression and ((self.depth == 0) or (np.mean(self.y) == 0) or (np.mean(self.y) == 1)):
-            self.label = (np.mean(self.y) > 0.5).astype(int)
+            self.label = np.mean(self.y)
         elif self.regression and ((self.depth == 0) or (self.coefficient_variation(self.y) < 0.1)):
             self.label = np.mean(self.y)
         else:
@@ -84,10 +84,7 @@ class DecisionTree:
                         self.split_info_gain = temp_info_gain
 
             if self.split_info_gain == 0:
-                if not self.regression:
-                    self.label = (np.mean(self.y) > 0.5).astype(int)
-                else:
-                    self.label = np.mean(self.y)
+                self.label = np.mean(self.y)
             else:
                 left_mask, right_mask = self.construct_splits(self.X)
                 self.left = DecisionTree(X=self.X[left_mask], y=self.y[left_mask], method=self.method, depth=self.depth-1, num_attributes=self.num_attributes, regression=self.regression)
@@ -96,7 +93,7 @@ class DecisionTree:
                 self.left.fit()
                 self.right.fit()
     
-    def predict(self, X):
+    def predict_proba(self, X):
         assert self.fitted, "Decision tree needs to be fit before prediction"
         
         if self.label is not None:
@@ -109,3 +106,10 @@ class DecisionTree:
             ans[right_mask] = self.right.predict(X[right_mask])
             
             return ans
+    
+    def predict(self, X):
+        y_hat = self.predict_proba(self, X)
+        if self.regression:
+            return y_hat
+        else:
+            return (y_hat > 0.5).astype(int)
