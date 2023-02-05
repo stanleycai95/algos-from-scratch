@@ -3,23 +3,22 @@ from decision_tree import DecisionTree
 
 class RandomForest:
     
-    def __init__(self, X, y, method='C4.5', depth=5, num_trees=10):
+    def __init__(self, method='C4.5', depth=5, num_trees=10):
         self.method = method
         self.depth = depth
-        self.X = X
-        self.y = y
         self.num_trees = num_trees
         self.decision_trees = []
         
-    def fit(self):
-        num_features_per_split = np.around(np.sqrt(X.shape[1])).astype(int)
+    def fit(self, X, y):
+        self.X, self.y = X, y
+        num_features_per_split = np.around(np.sqrt(self.X.shape[1])).astype(int)
         potential_samples = np.array(list(range(self.X.shape[0])))
         
         for i in range(self.num_trees):
-            row_subset = np.random.choice(potential_samples, X.shape[0], replace=True)
+            row_subset = np.random.choice(potential_samples, self.X.shape[0], replace=True)
             
-            dt = DecisionTree(X=X[row_subset,:], y=y[row_subset], num_attributes=num_features_per_split)
-            dt.fit()
+            dt = DecisionTree()
+            dt.fit(X=self.X[row_subset,:], y=self.y[row_subset], num_attributes=num_features_per_split)
             self.decision_trees.append(dt)
 
     def predict(self, X):
@@ -27,7 +26,7 @@ class RandomForest:
         
         ans = np.zeros(X.shape[0])
         for dt in self.decision_trees:
-            ans += dt.predict(X)
+            ans += dt.predict_proba(X)
         
         ans /= len(self.decision_trees)
         
@@ -49,12 +48,12 @@ train_test_cutoff = X.shape[0] * 4//5
 X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
 X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-dt = DecisionTree(X_train, y_train)
-dt.fit()
+dt = DecisionTree()
+dt.fit(X_train, y_train)
 y_pred = dt.predict(X_test)
 
-rf = RandomForest(X_train, y_train)
-rf.fit()
+rf = RandomForest()
+rf.fit(X_train, y_train)
 y_pred_rf = rf.predict(X_test)
 
 print("Decision tree accuracy")
