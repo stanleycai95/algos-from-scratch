@@ -110,4 +110,3 @@ class DecisionTree:
             return y_hat
         else:
             return (y_hat > 0.5).astype(int)
-            
