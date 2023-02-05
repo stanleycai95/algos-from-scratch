@@ -31,7 +31,7 @@ class GradientBoostedDecisionTree:
                 break
     
     def predict(self, X):
-        assert self.fitted, "Decision tree needs to be fit before prediction"
+        assert self.fitted, "GBDT needs to be fit before prediction"
         
         y_pred = np.ones(X.shape[0]) * self.intercept
         for i in range(len(self.models)):
