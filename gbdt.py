@@ -68,6 +68,3 @@ y_pred_gbdt = gbdt.predict(X_test)
 
 print("GBDT loss")
 print(loss_func(y_pred_gbdt, y_test))
-
-print("Class balance check")
-print(np.mean(y))
