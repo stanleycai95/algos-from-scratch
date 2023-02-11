@@ -36,9 +36,6 @@ class DecisionTree:
         
         return -np.sum(p * np.log2(p))
     
-    def coefficient_variation(self, y):
-        return np.std(y) / max(abs(np.mean(y)), 1)
-    
     def construct_splits(self, X):
         left_mask = X[:, self.split_feat] <= self.split_threshold
         right_mask = X[:, self.split_feat] > self.split_threshold
@@ -71,8 +68,8 @@ class DecisionTree:
                         entropy_before_split = self.entropy(self.y)
                         temp_info_gain = entropy_after_split - entropy_before_split
                     else:
-                        cv_after_split = 1 / len(self.y) * ((i+1) * self.coefficient_variation(self.y[:i+1]) + (len(self.y) - i - 1) * self.coefficient_variation(self.y[i+1:]))
-                        cv_before_split = self.coefficient_variation(self.y)
+                        cv_after_split = 1 / len(self.y) * ((i+1) * np.var(self.y[:i+1]) + (len(self.y) - i - 1) * np.var(self.y[i+1:]))
+                        cv_before_split = np.var(self.y)
                         temp_info_gain = cv_after_split - cv_before_split
                     
                     if temp_info_gain < self.split_info_gain:
