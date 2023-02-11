@@ -3,9 +3,9 @@ from decision_tree import DecisionTree
 
 class GradientBoostedDecisionTree:
     
-    def __init__(self, num_iterations=10, scaling_param=0.5, depth=2, regression=True):
+    def __init__(self, num_iterations=10, shrinkage=0.5, depth=2, regression=True):
         self.num_iterations = num_iterations
-        self.scaling_param = scaling_param
+        self.shrinkage = shrinkage
         self.regression = regression
         self.depth = depth
         self.fitted = False
@@ -22,7 +22,7 @@ class GradientBoostedDecisionTree:
             pseudo_residuals = (y - y_hat)
             dt = DecisionTree(depth=self.depth, regression=self.regression)
             dt.fit(X=X, y=pseudo_residuals)
-            y_hat += self.scaling_param * dt.predict(X)
+            y_hat += self.shrinkage * dt.predict(X)
             print(loss_func(y_hat, y))
             if loss_func(y_hat, y) < curr_loss:
                 curr_loss = loss_func(y_hat, y)
@@ -35,7 +35,7 @@ class GradientBoostedDecisionTree:
         
         y_pred = np.ones(X.shape[0]) * self.intercept
         for i in range(len(self.models)):
-            y_pred += self.scaling_param * self.models[i].predict(X)
+            y_pred += self.shrinkage * self.models[i].predict(X)
         
         return y_pred
         
