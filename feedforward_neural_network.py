@@ -1,6 +1,6 @@
 import numpy as np
 
-class FeedforwardNeuralNet:
+class FeedforwardNeuralNetwork:
     
     def __init__(self, layer_dims, learning_rate=1e-5, batch_size=64, activation_type='leaky_relu'):
         assert (len(layer_dims) >= 1) and (layer_dims[-1] == 1), "invalid layer dimensions for neural net"
@@ -114,7 +114,7 @@ def test_class():
     X_train, y_train = X[:train_test_cutoff,:], y[:train_test_cutoff]
     X_test, y_test = X[train_test_cutoff:,:], y[train_test_cutoff:]
 
-    nn = FeedforwardNeuralNet([10,1])
+    nn = FeedforwardNeuralNetwork([10,1])
     nn.fit(X_train, y_train)
     y_pred = nn.predict(X_test)
     y_pred_train = nn.predict(X_train)
