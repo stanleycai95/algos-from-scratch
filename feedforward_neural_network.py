@@ -67,7 +67,7 @@ class FeedforwardNeuralNetwork:
         self.initialize_neuralnet(X)
         
         for i in range(epochs):
-            self.learning_rate *= 0.99
+            self.learning_rate *= 0.999
             p = np.random.permutation(len(X))
             X, y = X[p], y[p]
             num_batches = X.shape[0] // self.batch_size
