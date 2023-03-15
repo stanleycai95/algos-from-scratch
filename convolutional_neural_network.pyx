@@ -61,7 +61,7 @@ class Conv2D:
                     self.weights[k,i,j] -= self.learning_rate * np.mean(input_grad[:,:,:,k] * padded_activations[:, i:i+input_grad.shape[1],
                                                                                                             j:j+input_grad.shape[2],k])
         
-        return output_grad
+        return output_grad # This output gradient isn't correct, so the current code will only work with 1-layer CNN. Will fix soon.
 
 class Pool2D:
     
