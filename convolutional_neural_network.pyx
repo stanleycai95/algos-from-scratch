@@ -135,6 +135,7 @@ class ConvolutionalNeuralNetwork:
     
     def __init__(self, layers_num_filters, batch_size=256, num_epochs=5):
         assert len(layers_num_filters) >= 1, "invalid layer dimensions for neural net"
+        assert len(layers_num_filters == 1, "only 1-layer CNN currently implemented; deep CNN will be implemented soon"
         
         self.batch_size = batch_size
         self.layers_num_filters = layers_num_filters
