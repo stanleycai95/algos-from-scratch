@@ -63,23 +63,23 @@ class Conv2D:
         
         return output_grad
 
-class MaxPool2D:
+class Pool2D:
     
     def __init__(self, pool_dim=2, pool_type='avg'):
         self.pool_dim = pool_dim
         self.pool_type = pool_type
     
     def forwardprop(self, X):
-        maxpool_outputs = np.zeros(shape=(X.shape[0], X.shape[1]//self.pool_dim, X.shape[2]//self.pool_dim, X.shape[3]))
+        pool_outputs = np.zeros(shape=(X.shape[0], X.shape[1]//self.pool_dim, X.shape[2]//self.pool_dim, X.shape[3]))
         
         for n in range(X.shape[0]):
-            for i in range(maxpool_outputs.shape[1]):
-                for j in range(maxpool_outputs.shape[2]):
+            for i in range(pool_outputs.shape[1]):
+                for j in range(pool_outputs.shape[2]):
                     left_bound, top_bound = i * self.pool_dim, j * self.pool_dim
                     curr_segment = X[n, left_bound:left_bound+self.pool_dim, top_bound:top_bound+self.pool_dim, :]
-                    maxpool_outputs[n, i, j, :] = np.mean(curr_segment, axis=(0,1))
+                    pool_outputs[n, i, j, :] = np.mean(curr_segment, axis=(0,1))
         
-        return maxpool_outputs
+        return pool_outputs
     
     def backprop(self, grad):
         output_grad = grad
@@ -184,7 +184,7 @@ class ConvolutionalNeuralNetwork:
                 input_shape, num_filters = (X.shape[0], input_dim1, input_dim2, input_channels), self.layers_num_filters[i]
                 
             self.layers.append(Conv2D(num_filters=num_filters, input_shape=input_shape))
-            self.layers.append(MaxPool2D())
+            self.layers.append(Pool2D())
             self.layers.append(LeakyRelu())
             
         input_dim1, input_dim2, input_channels = self.layers[-3].get_output_shape()
