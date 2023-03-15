@@ -34,7 +34,7 @@ class Conv2D:
                     left_bound, top_bound = i * self.stride, j * self.stride
                     curr_segment = X[n, left_bound:left_bound+self.filter_size, top_bound:top_bound+self.filter_size, :]
                     for k in range(self.num_filters):
-                        conv2d_outputs[n, i, j, k] = np.sum(np.sum(curr_segment, axis=-1) * self.weights[k,:,:]) #+ self.biases[k]
+                        conv2d_outputs[n, i, j, k] = np.sum(np.sum(curr_segment, axis=-1) * self.weights[k,:,:]) + self.biases[k]
         
         return conv2d_outputs
     
@@ -82,7 +82,6 @@ class MaxPool2D:
         return maxpool_outputs
     
     def backprop(self, grad):
-        #output_grad = np.repeat(np.repeat(grad, self.pool_dim, axis=1), self.pool_dim, axis=2)
         output_grad = grad
         return output_grad
         
@@ -106,7 +105,7 @@ class Dense:
         self.learning_rate = learning_rate
     
     def forwardprop(self, X):
-        return (X @ self.weights) #+ self.biases
+        return (X @ self.weights) + self.biases
     
     def backprop(self, input_grad, activations):
         m = activations.shape[0]
