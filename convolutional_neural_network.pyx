@@ -53,7 +53,7 @@ class Conv2D:
                         filter_sum[n, i:(i+self.filter_size), j:(j+self.filter_size), k] += self.weights[k,:,:]
         output_grad = np.mean(filter_sum * input_grad, axis=-1)[:,:,:,None]
         
-        self.biases -= self.learning_rate * np.sum(input_grad, axis=(0, 1, 2))
+        self.biases -= self.learning_rate * np.mean(input_grad, axis=(0, 1, 2))
 
         for k in range(self.weights.shape[0]):
             for i in range(self.weights.shape[1]):
