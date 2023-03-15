@@ -43,16 +43,7 @@ class Conv2D:
         padded_activations = np.pad(activations, ((0,0), (self.pad_dim, self.pad_dim), (self.pad_dim, self.pad_dim), (0,0)), mode='constant', constant_values=0)
 
         filter_sum = np.zeros(shape=input_grad.shape)
-        self.learning_rate *= 0.99
-        
-        for n in range(m):
-            for i in range((input_grad.shape[1] - self.filter_size + 1) // self.stride):
-                for j in range((input_grad.shape[2] - self.filter_size + 1) // self.stride):
-                    left_bound, top_bound = i * self.stride, j * self.stride
-                    for k in range(self.num_filters):
-                        filter_sum[n, i:(i+self.filter_size), j:(j+self.filter_size), k] += self.weights[k,:,:]
-        output_grad = np.mean(filter_sum * input_grad, axis=-1)[:,:,:,None]
-        
+        self.learning_rate *= 0.99        
         self.biases -= self.learning_rate * np.mean(input_grad, axis=(0, 1, 2))
 
         for k in range(self.weights.shape[0]):
@@ -60,8 +51,9 @@ class Conv2D:
                 for j in range(self.weights.shape[2]):
                     self.weights[k,i,j] -= self.learning_rate * np.mean(input_grad[:,:,:,k] * padded_activations[:, i:i+input_grad.shape[1],
                                                                                                             j:j+input_grad.shape[2],k])
+        output_grad = None
         
-        return output_grad # This output gradient isn't correct, so the current code will only work with 1-layer CNN. Will fix soon.
+        return output_grad # Current code only works with 1-layer CNN; deep CNN to be implemented later
 
 class Pool2D:
     
