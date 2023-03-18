@@ -16,7 +16,7 @@ class Conv2D:
 
         self.weights = np.array([np.random.normal(0, np.sqrt(1 / (num_filters * filter_size**2)), 
                                                   size=(filter_size, filter_size)) for i in range(num_filters)])
-        self.biases = np.zeros(shape=self.num_filters)
+        self.bias = 0
             
     def get_output_shape(self):
         return int(self.input_shape[1]), int(self.input_shape[2]), self.num_filters
@@ -34,27 +34,32 @@ class Conv2D:
                     left_bound, top_bound = i * self.stride, j * self.stride
                     curr_segment = X[n, left_bound:left_bound+self.filter_size, top_bound:top_bound+self.filter_size, :]
                     for k in range(self.num_filters):
-                        conv2d_outputs[n, i, j, k] = np.sum(np.sum(curr_segment, axis=-1) * self.weights[k,:,:]) + self.biases[k]
+                        conv2d_outputs[n, i, j, k] = np.sum(np.sum(curr_segment, axis=-1) * self.weights[k,:,:]) + self.bias
         
         return conv2d_outputs
     
     def backprop(self, input_grad, activations, next_layer=None):
-        m = activations.shape[0]
         padded_activations = np.pad(activations, ((0,0), (self.pad_dim, self.pad_dim), (self.pad_dim, self.pad_dim), (0,0)), mode='constant', constant_values=0)
 
-        filter_sum = np.zeros(shape=input_grad.shape)
         self.learning_rate *= 0.99        
-        self.biases -= self.learning_rate * np.mean(input_grad, axis=(0, 1, 2))
+        self.bias -= self.learning_rate * np.mean(input_grad)
 
         for k in range(self.weights.shape[0]):
             for i in range(self.weights.shape[1]):
                 for j in range(self.weights.shape[2]):
-                    self.weights[k,i,j] -= self.learning_rate * np.mean(input_grad[:,:,:,k] * padded_activations[:, i:i+input_grad.shape[1],
+                    self.weights[k,i,j] -= self.learning_rate * np.mean(input_grad * padded_activations[:, i:i+input_grad.shape[1],
                                                                                                             j:j+input_grad.shape[2],k])
-        output_grad = None
+        output_grad = np.zeros(shape=input_grad.shape)
+        for i in range(output_grad.shape[1]):
+            for j in range(output_grad.shape[2]):
+                top_bound, left_bound = max(self.pad_dim-i, 0), max(self.pad_dim-j, 0)
+                bottom_bound, right_bound = min(input_grad.shape[1]-i, self.filter_size), min(input_grad.shape[2]-j, self.filter_size)
+                weight_contribution = np.mean(self.weights[:, top_bound:bottom_bound, left_bound:right_bound])
+                output_grad[:,i,j] = input_grad[:,i,j] * weight_contribution
         
-        return output_grad # Current code only works with 1-layer CNN; deep CNN to be implemented later
-
+        print(np.percentile(output_grad, [75 ,25]))
+        return output_grad
+    
 class Pool2D:
     
     def __init__(self, pool_dim=2, pool_type='avg'):
@@ -85,7 +90,7 @@ class Flatten:
         return flattened_X
     
     def backprop(self, grad):
-        reshaped_grad = grad.reshape(self.original_shape)
+        reshaped_grad = grad.reshape(self.original_shape).mean(axis=-1)
         return reshaped_grad
 
 class Dense:
@@ -135,7 +140,6 @@ class ConvolutionalNeuralNetwork:
     
     def __init__(self, layers_num_filters, batch_size=256, num_epochs=5):
         assert len(layers_num_filters) >= 1, "invalid layer dimensions for neural net"
-        assert len(layers_num_filters) == 1, "only 1-layer CNN currently implemented; deep CNN will be implemented soon"
         
         self.batch_size = batch_size
         self.layers_num_filters = layers_num_filters
@@ -255,7 +259,7 @@ def test_class(train_size, test_size):
     print("Train shape, test shape")
     print(X_train.shape, X_test.shape)
     
-    cnn = ConvolutionalNeuralNetwork([5])
+    cnn = ConvolutionalNeuralNetwork([3, 4])
     cnn.fit(X_train, y_train)
     y_pred = cnn.predict(X_test)
     y_pred_proba = cnn.predict_proba(X_test)
