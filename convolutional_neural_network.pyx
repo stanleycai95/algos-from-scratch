@@ -57,7 +57,6 @@ class Conv2D:
                 weight_contribution = np.mean(self.weights[:, top_bound:bottom_bound, left_bound:right_bound])
                 output_grad[:,i,j] = input_grad[:,i,j] * weight_contribution
         
-        print(np.percentile(output_grad, [75 ,25]))
         return output_grad
     
 class Pool2D:
