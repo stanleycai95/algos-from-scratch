@@ -229,7 +229,6 @@ class ConvolutionalNeuralNetwork:
     def backprop(self, X, y):
         for i in range(len(self.layers)):
             layer_index = len(self.layers) - i-1
-            next_layer = None
             if i == 0:
                 grad = (self.activations[-1] - y)
             else:
