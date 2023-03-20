@@ -2,7 +2,7 @@ import numpy as np
 
 class Conv2D:
     
-    def __init__(self, num_filters, input_shape, filter_size=5, stride=1, learning_rate=3e1):
+    def __init__(self, num_filters, input_shape, filter_size=5, stride=1, learning_rate=1e1):
         assert num_filters >= 1
         assert (filter_size % 2) == 1
         assert len(input_shape) == 4
@@ -94,7 +94,7 @@ class Flatten:
 
 class Dense:
     
-    def __init__(self, input_shape, output_shape=1, learning_rate=3e-4):
+    def __init__(self, input_shape, output_shape=1, learning_rate=3e-5):
         
         self.weights = np.random.normal(0, np.sqrt(1 / (input_shape * output_shape)), size=(input_shape, output_shape))
         self.biases = np.zeros(shape=output_shape)
@@ -117,11 +117,12 @@ class Dense:
 class Sigmoid:
     
     def forwardprop(self, X):
+        self.activation = X
         sigmoid_X = np.exp(X) / (1 + np.exp(X))
         return sigmoid_X
     
     def backprop(self, input_grad):
-        sigmoid_grad = self.forwardprop(input_grad)
+        sigmoid_grad = self.forwardprop(self.activation)
         output_grad = input_grad * (sigmoid_grad * (1 - sigmoid_grad))
         return output_grad
 
