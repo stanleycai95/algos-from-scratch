@@ -243,7 +243,7 @@ class ConvolutionalNeuralNetwork:
                 else:
                     grad = self.layers[layer_index].backprop(grad)
 
-def test_class(train_size, test_size):
+def test_ml_algo_class(train_size, test_size):
 
     from keras.datasets import mnist
     
