@@ -103,7 +103,7 @@ class FeedforwardNeuralNetwork:
             self.layer_biases[layer_index] -= self.learning_rate * np.mean(delta, axis=0)
         
 
-def test_class():
+def test_ml_algo_class():
     from sklearn.datasets import fetch_california_housing
 
     X, y = fetch_california_housing(return_X_y=True)
