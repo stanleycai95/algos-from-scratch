@@ -58,7 +58,7 @@ class LogisticRegression:
         return np.mean(y == y_pred)
     
     
-def test_class():
+def test_ml_algo_class()():
     import seaborn as sns
 
     titanic = sns.load_dataset('titanic')
