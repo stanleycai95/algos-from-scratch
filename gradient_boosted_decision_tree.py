@@ -46,7 +46,7 @@ def loss_func(y_pred, y, regression=True):
         return 1 - np.mean(y_pred == y)
 
     
-def test_class():
+def test_ml_algo_class():
     from sklearn.datasets import fetch_california_housing
 
     X, y = fetch_california_housing(return_X_y=True)
