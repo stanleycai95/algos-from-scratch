@@ -59,7 +59,7 @@ class LinearRegression:
         return np.dot((y[:,None] - preds).T, (y[:,None] - preds)) / y.shape[0]
 
 
-def test_class():
+def test_ml_algo_class():
     import seaborn as sns
 
     tips = sns.load_dataset("tips")
