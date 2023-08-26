@@ -51,7 +51,7 @@ class KMeans:
         return self.all_labels
 
 
-def test_class():
+def test_ml_algo_class():
   from sklearn.datasets import load_digits
 
   data, labels = load_digits(return_X_y=True)
