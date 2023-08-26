@@ -42,7 +42,7 @@ class PrincipalComponentsAnalysis:
         return np.mean(np.abs(self.X_reconstructed - self.X))
     
     
-def test_class():
+def test_ml_algo_class()():
     from sklearn.datasets import load_breast_cancer
     cancer = load_breast_cancer()
 
