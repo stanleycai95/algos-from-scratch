@@ -5,17 +5,14 @@ class FeedforwardNeuralNetwork:
     def __init__(self, layer_dims, learning_rate=1e-4, batch_size=64, activation_type='leaky_relu', optimizer='Adam'):
         assert (len(layer_dims) >= 1) and (layer_dims[-1] == 1), "invalid layer dimensions for neural net"
         assert activation_type in ('leaky_relu', 'sigmoid'), "other activations not implemented yet"
-        assert optimizer in ('SGD', 'momentum', 'RMSProp', 'Adam'), "other optimizers not implemented yet"
+        assert optimizer in ('SGD', 'RMSProp'), "other optimizers not implemented yet"
         
         self.learning_rate = learning_rate
         self.batch_size = batch_size
         self.layer_dims = layer_dims
         self.activation_type = activation_type
         self.optimizer = optimizer
-        if self.optimizer in ('momentum', 'Adam'):
-            self.Beta1 = 0.99
-            self.momentums = [0] * len(self.layer_dims)
-        if self.optimizer in ('RMSProp', 'Adam'):
+        if self.optimizer in ('RMSProp'):
             self.Beta2 = 0.99
             self.rmsprops = [0] * len(self.layer_dims)
             self.eps = 0.01
@@ -110,19 +107,12 @@ class FeedforwardNeuralNetwork:
             else:
                 delta = np.multiply(delta @ self.layer_weights[layer_index+1].T, self.activation_derivative(self.z[layer_index+1]))
             
-            if self.optimizer in ('momentum', 'Adam'):
-                self.momentums[i] = self.Beta1 * self.momentums[i] + (1 - self.Beta1) * delta
-                self.momentums[i] /= (1 - self.Beta1 ** self.time_step)
-            if self.optimizer in ('RMSProp', 'Adam'):
+            if self.optimizer in ('RMSProp'):
                 self.rmsprops[i] = self.Beta2 * self.rmsprops[i] + (1 - self.Beta2) * np.square(delta)
                 self.rmsprops[i] /= (1 - self.Beta2 ** self.time_step)
             
-            if self.optimizer == 'momentum':
-                delta = self.momentums[i]
-            elif self.optimizer == 'RMSProp':
+            if self.optimizer == 'RMSProp':
                 delta = delta / (np.sqrt(self.rmsprops[i]) + self.eps)
-            elif self.optimizer == 'Adam':
-                delta = self.momentums[i] / (np.sqrt(self.rmsprops[i]) + self.eps)
                 
             self.layer_weights[layer_index] -= self.learning_rate * self.activations[layer_index].T @ delta
             self.layer_biases[layer_index] -= self.learning_rate * np.mean(delta, axis=0)
@@ -153,3 +143,4 @@ def test_ml_algo_class(optimizer):
     
     print("Baseline loss")
     print(nn.mean_squared_error(y.mean(), y))
+    
