@@ -30,8 +30,8 @@ class PrincipalForest:
         return dt
 
     def fit(self, X, y):
-        self.sk_pca = PCA(X.shape[1]).fit(X)
         self.std_scaler = StandardScaler().fit(X)
+        self.sk_pca = PCA(X.shape[1]).fit(self.std_scaler.transform(X))
         self.X = self.sk_pca.transform(self.std_scaler.transform(X))
         self.y = y
         self.num_features_per_split = np.around(np.sqrt(self.X.shape[1])).astype(int)
