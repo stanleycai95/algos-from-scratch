@@ -7,6 +7,8 @@ Results:
 Inconclusive so far.
 """
 
+from joblib import Parallel, delayed # parallelize the trees
+
 class DiversityForest:
     
     def __init__(self, method='C4.5', depth=5, num_trees=100):
